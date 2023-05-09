@@ -1,21 +1,18 @@
 #include "Fraction.hpp"
 #include <iostream>
+#include <stdexcept>
+#include <limits>
 
 namespace ariel{
 
-
-//gpt
 int greatestCommonDivisor(int a, int b) {
-    // Ensure a and b are positive
     a = abs(a);
     b = abs(b);
 
-    // Swap if necessary to ensure a >= b
     if (a < b) {
         std::swap(a, b);
     }
 
-    // Compute GCD using Euclidean algorithm
     while (b != 0) {
         int remainder = a % b;
         a = b;
@@ -25,220 +22,355 @@ int greatestCommonDivisor(int a, int b) {
     return a;
 }
 
-void Fraction:: reduce(){
-   int gcd = greatestCommonDivisor(_numerator, _denominator);
+void Fraction::reduce() {
+    int gcd = greatestCommonDivisor(_numerator, _denominator);
     _numerator /= gcd;
     _denominator /= gcd;
 }
+
+void Fraction::minus() {
+if(_denominator<0 && _numerator>0)
+{
+    _denominator*=(-1);
+    _numerator*=(-1);
+return;
+}
+if(_denominator<0 && _numerator<0){
+    _denominator*=(-1);
+    _numerator*=(-1);
+return;
+}
+if(_numerator==0){
+    _denominator=1;
+    _numerator=0;
+    return;
+}
+
+else return;
+}
+
+
+
+Fraction ::Fraction()
+{
+    this->_numerator=0;
+    this->_denominator=1;
+}
+
+Fraction::Fraction(int num, int denom)
+    : _numerator(num), _denominator(denom)
+{
+    if (_denominator == 0) {
+throw std::invalid_argument("Error: Denominator cannot be zero.");   
+    }
+    reduce();
+    minus();
+}
+
+Fraction::Fraction(float value){
+    if(value==0)
+    {
+this->_numerator=0;
+this->_denominator=4;
+return;
+    }
+   this->_numerator = value * 1000;
+        this->_denominator = 1000;
+        reduce();
+        minus();
+    }
+
 
 float Fraction::toFloat() const {
     return static_cast<float>(_numerator) / static_cast<float>(_denominator);
 }
 
 
+int Fraction::getNumerator() const{ return this->_numerator;}
+int Fraction::getDenominator() const{return this->_denominator;}
 
-/*
-*Math operators
-*/
-Fraction Fraction::operator+(const Fraction& other) const {
-    int newNumerator = _numerator * other._denominator + other._numerator * _denominator;
-    int newDenominator = _denominator * other._denominator;
-    Fraction result(newNumerator, newDenominator);
-    result.reduce();
-    return result;
-}
-Fraction Fraction::operator+(const float& other) const {
-    Fraction result(*this);
-    Fraction otherFraction(other);
-    result._numerator = result._numerator * otherFraction._denominator + otherFraction._numerator * result._denominator;
-    result._denominator = result._denominator * otherFraction._denominator;
-    result.reduce();
-    return result;
+
+// Addition operator overloading
+Fraction operator+(const Fraction& a, const Fraction& other) {
+    long long num = static_cast<long long>(a._numerator) * static_cast<long long>(other._denominator) +
+                    static_cast<long long>(other._numerator) * static_cast<long long>(a._denominator);
+
+    // Check for overflow
+    if (num > std::numeric_limits<int>::max() || num < std::numeric_limits<int>::min()) {
+        throw std::overflow_error("Overflow occurred during addition of fractions");
+    }
+
+    int denom = a._denominator * other._denominator;
+    return Fraction(static_cast<int>(num), denom);
 }
 
-Fraction operator+(const float& num, const Fraction& other) {
-    Fraction result(other);
-    Fraction numFraction(num);
-    result._numerator = result._numerator + numFraction._numerator * result._denominator;
-    result.reduce();
-    return result;
+Fraction operator+(float float_frac, const Fraction& frac) {
+    Fraction float_fraction(float_frac);
+    return frac + float_fraction;
 }
 
-Fraction Fraction::operator-(const Fraction& other) const {
-    int newNumerator = _numerator * other._denominator - other._numerator * _denominator;
-    int newDenominator = _denominator * other._denominator;
-    Fraction result(newNumerator, newDenominator);
-    result.reduce();
-    return result;
+Fraction operator+(const Fraction& frac, float float_frac) {
+    Fraction float_fraction(float_frac);
+    return  float_fraction+frac;
 }
 
-Fraction Fraction::operator-(const float& other) const {
-    Fraction result(*this);
-    Fraction otherFraction(other);
-    result._numerator = result._numerator * otherFraction._denominator - otherFraction._numerator * result._denominator;
-    result._denominator = result._denominator * otherFraction._denominator;
-    result.reduce();
-    return result;
+// Subtraction operator overloading
+Fraction operator-(const Fraction& a, const Fraction& other) {
+    long long num = static_cast<long long>(a._numerator) * static_cast<long long>(other._denominator) -
+                    static_cast<long long>(other._numerator) * static_cast<long long>(a._denominator);
+
+    // Check for overflow
+    if (num > std::numeric_limits<int>::max() || num < std::numeric_limits<int>::min()) {
+        throw std::overflow_error("Overflow occurred during subtraction of fractions");
+    }
+
+    int denom = a._denominator * other._denominator;
+    return Fraction(static_cast<int>(num), denom);
 }
 
-Fraction operator-(const float& num, const Fraction& other) {
-    Fraction result(other);
-    Fraction numFraction(num);
-    result._numerator = numFraction._numerator * result._denominator - result._numerator;
-    result.reduce();
-    return result;
+Fraction operator-(float float_frac, const Fraction& frac) {
+    Fraction float_fraction(float_frac);
+    return float_fraction-frac;
 }
 
-
-Fraction Fraction::operator*(const Fraction& other) const {
-    Fraction result(*this);
-    result._numerator = result._numerator * other._numerator;
-    result._denominator = result._denominator * other._denominator;
-    result.reduce();
-    return result;
+Fraction operator-(const Fraction& frac, float float_frac) {
+    Fraction float_fraction(float_frac);
+    return frac - float_fraction;
 }
 
-Fraction Fraction::operator*(const float& other) const {
-    Fraction result(*this);
-    result._numerator = result._numerator * other;
-    result.reduce();
-    return result;
+// Multiplication operator overloading
+Fraction operator*(const Fraction& a, const Fraction& other) {
+    long long num = static_cast<long long>(a._numerator) * static_cast<long long>(other._numerator);
+    long long denom = static_cast<long long>(a._denominator) * static_cast<long long>(other._denominator);
+
+    // Check for overflow
+    if (num > std::numeric_limits<int>::max() || num < std::numeric_limits<int>::min() ||
+        denom > std::numeric_limits<int>::max() || denom < std::numeric_limits<int>::min()) {
+        throw std::overflow_error("Overflow occurred during multiplication of fractions");
+    }
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
-Fraction operator*(const float& num, const Fraction& other) {
-    Fraction result(other);
-    result._numerator = num * result._numerator;
-    result.reduce();
-    return result;
+Fraction operator*(float float_frac, const Fraction& frac) {
+    Fraction float_fraction(float_frac);
+    return frac * float_fraction;
 }
 
-Fraction Fraction::operator/(const float& other) const {
-    Fraction result(*this);
-    result._denominator = result._denominator * other;
-    result.reduce();
-    return result;
+Fraction operator*(const Fraction& frac, float float_frac) {
+    Fraction float_fraction(float_frac);
+    return frac * float_fraction;
 }
 
-Fraction Fraction::operator/(const Fraction& other) const {
-    Fraction result(*this);
-    result._numerator = result._numerator * other._denominator;
-    result._denominator = result._denominator * other._numerator;
-    result.reduce();
-    return result;
+// Division operator overloading
+Fraction operator/(const Fraction& a, const Fraction& other) {
+    if (other.getNumerator() == 0) {
+        throw std::runtime_error("cant divide with zero");
+    }
+
+    long long num = static_cast<long long>(a._numerator) * static_cast<long long>(other._denominator);
+    long long denom = static_cast<long long>(a._denominator) * static_cast<long long>(other._numerator);
+
+    // Check for overflow
+    if (num > std::numeric_limits<int>::max() || num < std::numeric_limits<int>::min() ||
+        denom > std::numeric_limits<int>::max() || denom < std::numeric_limits<int>::min()) {
+        throw std::overflow_error("Overflow occurred during division of fractions");
+    }
+
+    return Fraction(static_cast<int>(num), static_cast<int>(denom));
 }
 
-Fraction operator/(const float& num, const Fraction& other) {
-    Fraction result(other);
-    result._numerator = num * result._denominator;
-    result.reduce();
-    return result;
+Fraction operator/(float float_frac, const Fraction& frac) {
+    Fraction float_fraction(float_frac);
+    return float_fraction / frac;
 }
 
+Fraction operator/(const Fraction& frac, float float_frac) {
+    Fraction float_fraction(float_frac);
+    if (float_fraction.getNumerator()==0)
+    {
+throw std::runtime_error("cant divide with zero");
+    }
+    return frac / float_fraction;
+}
 
-/*
-*Comparison operators
-*/
 bool operator==(const Fraction& numA, float numB) {
-    return numA.toFloat() == numB;
+    float a = numA.toFloat();
+    return std::abs(a - numB) < std::numeric_limits<float>::epsilon();
 }
 
 bool operator<(const Fraction& numA, float numB) {
-    return numA.toFloat() < numB;
+    float a = numA.toFloat();
+    return a < numB && std::abs(a - numB) >= std::numeric_limits<float>::epsilon();
 }
 
 bool operator>(const Fraction& numA, float numB) {
-    return numA.toFloat() > numB;
+    float a = numA.toFloat();
+    return a > numB && std::abs(a - numB) >= std::numeric_limits<float>::epsilon();
 }
 
 bool operator<=(const Fraction& numA, float numB) {
-    return numA.toFloat() <= numB;
+    float a = numA.toFloat();
+    return a <= numB || std::abs(a - numB) < std::numeric_limits<float>::epsilon();
 }
 
 bool operator>=(const Fraction& numA, float numB) {
-    return numA.toFloat() >= numB;
-}
-
-
-bool Fraction::operator==(const Fraction& other) const {
-    return (_numerator == other._numerator) && (_denominator == other._denominator);
-}
-
-bool Fraction::operator<(const Fraction& other) const {
-    return (_numerator * other._denominator) < (other._numerator * _denominator);
-}
-
-bool Fraction::operator>(const Fraction& other) const {
-    return (_numerator * other._denominator) > (other._numerator * _denominator);
-}
-
-bool Fraction::operator>=(const Fraction& other) const {
-    return (_numerator * other._denominator) >= (other._numerator * _denominator);
-}
-
-bool Fraction::operator<=(const Fraction& other) const {
-    return (_numerator * other._denominator) <= (other._numerator * _denominator);
-}
-
-
-bool Fraction::operator==(float numA) {
-    return (_numerator == numA * _denominator);
-}
-
-bool Fraction::operator<(float numA) {
-    return (_numerator < numA * _denominator);
-}
-
-bool Fraction::operator>(float numA) {
-    return (_numerator > numA * _denominator);
-}
-
-bool Fraction::operator>=(float numA) {
-    return (_numerator >= numA * _denominator);
-}
-
-bool Fraction::operator<=(float numA) {
-    return (_numerator <= numA * _denominator);
+    float a = numA.toFloat();
+    return a >= numB || std::abs(a - numB) < std::numeric_limits<float>::epsilon();
 }
 
 
 
-/*
-* Increment and decrement, prefix and and postfix
-*/
+
+
+
+bool operator==(float numA, const Fraction& numB){
+    float b = numB.toFloat();
+    return std::abs(numA - b) < std::numeric_limits<float>::epsilon();
+}
+
+bool operator<( float numA, const Fraction& numB){
+    float b = numB.toFloat();
+    return numA < b && std::abs(numA - b) >= std::numeric_limits<float>::epsilon();
+}
+
+bool operator>(float numA, const Fraction& numB){
+    float b = numB.toFloat();
+    return numA > b && std::abs(numA - b) >= std::numeric_limits<float>::epsilon();
+}
+
+bool operator>=(float numA, const Fraction& numB){
+    float b = numB.toFloat();
+    return numA >= b || std::abs(numA - b) < std::numeric_limits<float>::epsilon();
+}
+
+bool operator<=(float numA, const Fraction& numB){
+    float b = numB.toFloat();
+    return numA <= b || std::abs(numA - b) < std::numeric_limits<float>::epsilon();
+}
+
+bool operator==(const Fraction& numA, const Fraction& other) {
+    if(numA._numerator==0&& other._numerator==0)
+    {
+        return true;
+    }
+    if(numA._denominator*(-1)==other._denominator && numA._numerator==other._numerator*(-1))
+    {
+    return true;
+    }
+    return (numA._numerator == other._numerator) && (numA._denominator == other._denominator);
+}
+
+bool operator<(const Fraction& numA, const Fraction& other) {
+    return (numA._numerator * other._denominator) < (other._numerator * numA._denominator);
+}
+
+bool operator>(const Fraction& numA, const Fraction& other) {
+    return (numA._numerator * other._denominator) > (other._numerator * numA._denominator);
+}
+
+bool operator<=(const Fraction& numA, const Fraction& other) {
+    return (numA._numerator * other._denominator) <= (other._numerator * numA._denominator);
+}
+
+bool operator>=(const Fraction& numA, const Fraction& other) {
+    return (numA._numerator * other._denominator) >= (other._numerator * numA._denominator);
+}
+ 
+
 Fraction& Fraction::operator++() {
     _numerator += _denominator;
     return *this;
 }
-
 Fraction& Fraction::operator--() {
     _numerator -= _denominator;
     return *this;
 }
-
-Fraction Fraction::operator++(int dummy) {
-    Fraction oldVal = *this;
+Fraction Fraction::operator++(int) {
+    Fraction temp = *this;
     _numerator += _denominator;
-    return oldVal;
+    return temp;
 }
-
-Fraction Fraction::operator--(int dummy) {
-    Fraction oldVal = *this;
+Fraction Fraction::operator--(int) {
+    Fraction temp = *this;
     _numerator -= _denominator;
-    return oldVal;
+    return temp;
 }
 
 
 
+//taken form gpt
+std::istream& operator>>(std::istream& inputStream, Fraction& fraction)
+{
+    int num = 0, denom = 1;
+    int sign = 1;
+    bool in_num = true;
+
+    // Read the numerator
+    if (!(inputStream >> num))
+    {
+        // Failed to read numerator
+        throw std::runtime_error("Failed to read numerator");
+    }
+
+    // Check for negative sign
+    char c = inputStream.peek();
+    // if (c == '-')
+    // {
+    //     sign = -1;
+    //     inputStream.ignore(1); 
+    // }
 
 
-/*
-*Friend global  IO oprators io stands for input output
-* takend from the course git
-*/
-std::ostream& operator<<(std::ostream& output, const Fraction& numA) {
-    output << numA.numerator() << "/" << numA.denominator();
-    return output;
+    // Read the denominator
+    if (!(inputStream >> denom))
+    {
+        // Failed to read denominator
+        throw std::runtime_error("Failed to read denominator");
+    }
+
+    if (denom == 0)
+    {
+        // Denominator cannot be zero
+        throw std::runtime_error("Denominator cannot be zero");
+    }
+
+    // Handle the case where the numerator is zero and the denominator is not negative
+    if (num == 0 && denom > 0)
+    {
+        fraction.setNumerator(num);
+        fraction.setDenominator(denom);
+        return inputStream;
+    }
+
+    // Handle the case where the numerator is zero and the denominator is negative
+    if (num == 0 && denom < 0)
+    {
+        num *= -1;
+        denom *= -1;
+        fraction.setNumerator(num);
+        fraction.setDenominator(denom);
+        return inputStream;
+    }
+
+    fraction.setNumerator(num * sign);
+    fraction.setDenominator(denom);
+
+    return inputStream;
 }
-std::istream& operator>>(std::istream& input, Fraction& numA){ return input;};
+
+
+std::ostream& operator<<(std::ostream& stream, const Fraction& frac)
+{
+Fraction t = frac;
+// if the denominator is negative flip signs
+if (t.getDenominator() < 0)
+{
+t.setNumerator(-t.getNumerator());
+t.setDenominator(-t.getDenominator());
+}
+stream << t.getNumerator() << "/" << t.getDenominator();
+return stream;
+}
 }
  

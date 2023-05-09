@@ -9,46 +9,56 @@
   * 
  */
 
+
+
 namespace ariel {
 class Fraction{
 
 private:
     int _numerator ;
     int _denominator;
-    void reduce();
-    float toFloat() const;
-public:
-Fraction (const int& num=0, const int& denum=1)
-    : _numerator(num), _denominator(denum){
-        if(_denominator==0){
-        throw ("error");
-        }
-    };
 
+public:
+/*
+*constructors
+*/
+Fraction();
+Fraction(float value);
+Fraction (int num , int denom);
+float toFloat()const;
+void reduce();
+void minus();
 /*
 *Getters
 */
-int numerator() const{ return _numerator; }
-int denominator() const{return _denominator;  }
+int getNumerator() const;
+int getDenominator() const;
+
 
 /*
-*Math operators
+*Setters
 */
+void setNumerator(const int& num) { _numerator = num; }
+void setDenominator(const int& denum) {
+    if (denum == 0) {
+           throw ("error");
+    }
+     _denominator = denum;
+    }
 
 //  const in the end of the operator overloading is to determine that the object woldn't modified
-Fraction operator+ (const Fraction& other) const;
-Fraction operator+ (const float& other) const;
-friend Fraction operator+ (const float& num, const Fraction& other);
-Fraction operator- (const Fraction& other) const;
-Fraction operator- (const float& other) const;
-friend Fraction operator- (const float& num, const Fraction& other);
-Fraction operator* (const Fraction& other) const; 
-Fraction operator* (const float& other) const;
-friend Fraction operator* (const float& num, const Fraction& other);
-Fraction operator/ (const Fraction& other) const; 
-Fraction operator/ (const float& other) const; 
-friend Fraction operator/ (const float& num, const Fraction& other);
-
+friend Fraction operator+(const Fraction& numA, const Fraction& other);
+friend Fraction operator+(float float_frac, const Fraction& frac);
+friend Fraction operator+(const Fraction& frac, float float_frac);
+friend Fraction operator-(const Fraction& numA, const Fraction& other);
+friend Fraction operator-(float float_frac, const Fraction& frac);
+friend Fraction operator-(const Fraction& frac, float float_frac);
+friend Fraction operator*(const Fraction& numA, const Fraction& other);
+friend Fraction operator*(float float_frac, const Fraction& frac);
+friend Fraction operator*(const Fraction& frac, float float_frac);
+friend Fraction operator/(const Fraction& numA, const Fraction& other);
+friend Fraction operator/(float float_frac, const Fraction& frac);
+friend Fraction operator/(const Fraction& frac, float float_frac);
 
 //float operator* (const Fraction& other )const;
 /*
@@ -61,18 +71,18 @@ friend bool operator>=(const Fraction& numA, float numB);
 friend bool operator<=(const Fraction& numA, float numB);
 
 
+friend bool operator==(float numA, const Fraction& numB);
+friend bool operator<( float numA, const Fraction& numB);
+friend bool operator>(float numA, const Fraction& numB);
+friend bool operator>=(float numA, const Fraction& numB);
+friend bool operator<=(float numA, const Fraction& numB);
 
-bool operator==(const Fraction& numB)const;
-bool operator<( const Fraction& numB)const;
-bool operator>(const Fraction& numB)const;
-bool operator>=(const Fraction& numB)const;
-bool operator<=(const Fraction& numB)const;
+friend bool operator==(const Fraction& numA, const Fraction& other) ;
+friend bool operator<(const Fraction& numA,const Fraction& other) ;
+friend bool operator>(const Fraction& numA,const Fraction& other) ;
+friend bool operator<=(const Fraction& numA,const Fraction& other) ;
+friend bool operator>=(const Fraction& numA,const Fraction& other) ;
 
-bool operator==(float numA);
-bool operator<(float numA);
-bool operator>(float numA);
-bool operator>=(float numA);
-bool operator<=(float numA);
 /*
 * Increment and decrement, prefix and and postfix
 */
@@ -87,10 +97,8 @@ Fraction operator--(int);
 *Friend global  IO oprators io stands for input output
 * takend from the course git
 */
-friend std::ostream& operator<<(std::ostream& output, const Fraction& numA);
-friend std::istream& operator>>(std::istream& input , Fraction& numA);
-
-
+friend std::ostream &operator<<(std::ostream &stream, const Fraction &frac);
+friend std::istream& operator>>(std::istream& ios, Fraction& frac);
 
 
 
